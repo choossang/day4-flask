@@ -63,6 +63,61 @@ def show_post(post_id: int):
     return render_template("detail.html", post=post, view=view)
 
 
+@app.route("/posts/<int:post_id>/edit", methods=["GET", "POST"])
+def edit_post(post_id: int):
+    conn = get_connection()
+    post = conn.execute(
+        "SELECT id, title, content, created_at FROM posts WHERE id = ?",
+        (post_id,),
+    ).fetchone()
+
+    if post is None:
+        conn.close()
+        abort(404)
+
+    if request.method == "POST":
+        title = request.form.get("title", "").strip()
+        content = request.form.get("content", "").strip()
+
+        if not title or not content:
+            conn.close()
+            return render_template(
+                "write.html",
+                error="제목과 본문을 입력해주세요",
+                title=title,
+                content=content,
+                form_action=url_for("edit_post", post_id=post_id),
+                form_title="글 수정",
+            )
+
+        conn.execute(
+            "UPDATE posts SET title = ?, content = ? WHERE id = ?",
+            (title, content, post_id),
+        )
+        conn.commit()
+        conn.close()
+        return redirect(url_for("show_post", post_id=post_id))
+
+    conn.close()
+    return render_template(
+        "write.html",
+        error=None,
+        title=post["title"],
+        content=post["content"],
+        form_action=url_for("edit_post", post_id=post_id),
+        form_title="글 수정",
+    )
+
+
+@app.route("/posts/<int:post_id>/delete", methods=["POST"])
+def delete_post(post_id: int):
+    conn = get_connection()
+    conn.execute("DELETE FROM posts WHERE id = ?", (post_id,))
+    conn.commit()
+    conn.close()
+    return redirect(url_for("list_posts"))
+
+
 @app.route("/write", methods=["GET", "POST"])
 def write_post():
     error = None

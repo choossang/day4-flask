@@ -1,10 +1,10 @@
 {% extends "base.html" %}
-{% block title %}글쓰기{% endblock %}
+{% block title %}{{ form_title or '글쓰기' }}{% endblock %}
 {% block content %}
   <main class="max-w-[1120px] mx-auto px-6 md:px-12 py-xl">
     <section class="max-w-3xl mx-auto bg-surface-container-low rounded-xl border border-outline-variant p-6 md:p-8">
       <div class="mb-md">
-        <h1 class="font-display text-display text-on-surface mb-sm">새 글 작성</h1>
+        <h1 class="font-display text-display text-on-surface mb-sm">{{ form_title or '새 글 작성' }}</h1>
         <p class="font-body-md text-body-md text-on-surface-variant">따뜻하고 차분한 톤으로 생각을 기록해 보세요.</p>
       </div>
 
@@ -14,7 +14,7 @@
         </div>
       {% endif %}
 
-      <form method="post" action="{{ url_for('write_post') }}" class="space-y-md">
+      <form method="post" action="{{ form_action or url_for('write_post') }}" class="space-y-md">
         <div>
           <label for="title" class="font-label-md text-label-md text-stone-500 uppercase tracking-wider block mb-2">제목</label>
           <input

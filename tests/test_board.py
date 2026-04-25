@@ -116,3 +116,67 @@ def test_list_page_supports_three_view_variants(client):
     assert "list-sidebar-layout" in sidebar_html
     assert "list-center-layout" in center_html
     assert "list-split-layout" in split_html
+
+
+def test_edit_page_reuses_write_form_with_existing_values(client):
+    post_id = insert_post_for_test("수정 전 제목", "수정 전 본문", "2026-04-25 12:10:00")
+
+    response = client.get(f"/posts/{post_id}/edit")
+    html = response.get_data(as_text=True)
+
+    assert response.status_code == 200
+    assert 'name="title"' in html
+    assert 'name="content"' in html
+    assert "수정 전 제목" in html
+    assert "수정 전 본문" in html
+
+
+def test_edit_post_updates_post_and_redirects(client):
+    post_id = insert_post_for_test("원래 제목", "원래 본문", "2026-04-25 12:20:00")
+
+    response = client.post(
+        f"/posts/{post_id}/edit",
+        data={"title": "수정된 제목", "content": "수정된 본문"},
+        follow_redirects=False,
+    )
+
+    assert response.status_code == 302
+    assert response.headers["Location"] == f"/posts/{post_id}"
+
+    detail = client.get(f"/posts/{post_id}")
+    html = detail.get_data(as_text=True)
+    assert "수정된 제목" in html
+    assert "수정된 본문" in html
+
+
+def test_edit_post_rejects_blank_input(client):
+    post_id = insert_post_for_test("유지 제목", "유지 본문", "2026-04-25 12:30:00")
+
+    response = client.post(
+        f"/posts/{post_id}/edit",
+        data={"title": " ", "content": ""},
+        follow_redirects=True,
+    )
+    html = response.get_data(as_text=True)
+
+    assert response.status_code == 200
+    assert "제목과 본문을 입력해주세요" in html
+
+
+def test_detail_page_has_edit_and_delete_controls(client):
+    post_id = insert_post_for_test("컨트롤 제목", "컨트롤 본문", "2026-04-25 12:40:00")
+    html = client.get(f"/posts/{post_id}").get_data(as_text=True)
+
+    assert f"/posts/{post_id}/edit" in html
+    assert f"/posts/{post_id}/delete" in html
+    assert "정말 삭제할까요" in html
+
+
+def test_delete_post_removes_post_and_redirects_to_list(client):
+    post_id = insert_post_for_test("삭제 제목", "삭제 본문", "2026-04-25 12:50:00")
+
+    response = client.post(f"/posts/{post_id}/delete", follow_redirects=False)
+
+    assert response.status_code == 302
+    assert response.headers["Location"] == "/"
+    assert client.get(f"/posts/{post_id}").status_code == 404
