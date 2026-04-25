@@ -1,4 +1,5 @@
 import sqlite3
+from pathlib import Path
 
 import pytest
 
@@ -180,3 +181,26 @@ def test_delete_post_removes_post_and_redirects_to_list(client):
     assert response.status_code == 302
     assert response.headers["Location"] == "/"
     assert client.get(f"/posts/{post_id}").status_code == 404
+
+
+def test_app_exposes_wsgi_application_for_render():
+    from app import app as flask_app
+
+    assert flask_app is not None
+
+
+def test_requirements_txt_includes_runtime_dependencies():
+    requirements = Path(__file__).resolve().parents[1] / "requirements.txt"
+    text = requirements.read_text(encoding="utf-8")
+
+    assert "Flask" in text
+    assert "gunicorn" in text
+
+
+def test_render_yaml_defines_web_service_start_command():
+    render_yaml = Path(__file__).resolve().parents[1] / "render.yaml"
+    text = render_yaml.read_text(encoding="utf-8")
+
+    assert "services:" in text
+    assert "type: web" in text
+    assert "startCommand: gunicorn app:app" in text
