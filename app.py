@@ -7,6 +7,26 @@ app = Flask(__name__)
 app.config.setdefault("DATABASE", "board.db")
 
 
+def init_db_if_needed():
+    conn = get_connection()
+    table_exists = conn.execute(
+        "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'posts'"
+    ).fetchone()
+    if table_exists is None:
+        conn.execute(
+            """
+            CREATE TABLE posts (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                title TEXT NOT NULL,
+                content TEXT NOT NULL,
+                created_at TEXT NOT NULL
+            )
+            """
+        )
+        conn.commit()
+    conn.close()
+
+
 def get_connection():
     conn = sqlite3.connect(app.config["DATABASE"])
     conn.row_factory = sqlite3.Row
@@ -27,6 +47,11 @@ def init_db():
     )
     conn.commit()
     conn.close()
+
+
+@app.before_request
+def ensure_schema():
+    init_db_if_needed()
 
 
 @app.route("/")

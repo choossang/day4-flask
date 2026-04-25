@@ -204,3 +204,13 @@ def test_render_yaml_defines_web_service_start_command():
     assert "services:" in text
     assert "type: web" in text
     assert "startCommand: gunicorn app:app" in text
+
+
+def test_list_route_initializes_schema_when_database_is_fresh(tmp_path):
+    fresh_db = tmp_path / "fresh.db"
+    app.config.update(TESTING=True, DATABASE=str(fresh_db))
+
+    with app.test_client() as test_client:
+        response = test_client.get("/")
+
+    assert response.status_code == 200
