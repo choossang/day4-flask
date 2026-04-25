@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Journal - Digital Intentionality</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Work+Sans:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary-container": "#f5f5dc",
+                    "surface-tint": "#5e604d",
+                    "inverse-on-surface": "#f4f0ed",
+                    "on-secondary-fixed": "#2d150d",
+                    "surface": "#fcf9f5",
+                    "surface-container-highest": "#e5e2df",
+                    "on-primary": "#ffffff",
+                    "on-secondary-fixed-variant": "#5e3f35",
+                    "secondary-fixed-dim": "#e9bdae",
+                    "surface-variant": "#e5e2df",
+                    "on-surface": "#1c1c1a",
+                    "on-tertiary": "#ffffff",
+                    "on-surface-variant": "#47473f",
+                    "tertiary-fixed-dim": "#cac4d1",
+                    "surface-container": "#f1edea",
+                    "surface-dim": "#ddd9d6",
+                    "secondary-fixed": "#ffdbcf",
+                    "on-tertiary-fixed": "#1d1a24",
+                    "on-tertiary-container": "#716d79",
+                    "on-error-container": "#93000a",
+                    "inverse-primary": "#c8c8b0",
+                    "on-secondary-container": "#79574c",
+                    "error-container": "#ffdad6",
+                    "tertiary-fixed": "#e7e0ee",
+                    "tertiary": "#615c68",
+                    "outline-variant": "#c8c7bc",
+                    "secondary": "#79564b",
+                    "tertiary-container": "#f8f1ff",
+                    "inverse-surface": "#31302e",
+                    "surface-container-low": "#f7f3f0",
+                    "on-primary-fixed": "#1b1d0e",
+                    "on-background": "#1c1c1a",
+                    "surface-bright": "#fcf9f5",
+                    "primary": "#5e604d",
+                    "secondary-container": "#fed0c1",
+                    "primary-fixed-dim": "#c8c8b0",
+                    "error": "#ba1a1a",
+                    "outline": "#78776e",
+                    "on-error": "#ffffff",
+                    "on-primary-fixed-variant": "#474836",
+                    "surface-container-high": "#ebe7e4",
+                    "primary-fixed": "#e4e4cc",
+                    "on-secondary": "#ffffff",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary-container": "#6f705c",
+                    "background": "#fcf9f5",
+                    "on-tertiary-fixed-variant": "#494550"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "xl": "80px",
+                    "container_max_width": "1120px",
+                    "xs": "8px",
+                    "sm": "16px",
+                    "md": "24px",
+                    "lg": "48px",
+                    "gutter": "20px",
+                    "base": "4px"
+            },
+            "fontFamily": {
+                    "h1": ["Plus Jakarta Sans"],
+                    "label-md": ["Work Sans"],
+                    "display": ["Plus Jakarta Sans"],
+                    "body-md": ["Work Sans"],
+                    "body-lg": ["Work Sans"],
+                    "h2": ["Plus Jakarta Sans"]
+            },
+            "fontSize": {
+                    "h1": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "label-md": ["14px", {"lineHeight": "1.4", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                    "display": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "h2": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #fcf9f5;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="font-body-md text-on-surface antialiased">
+<!-- TopNavBar -->
+<nav class="bg-[#F5F5DC] dark:bg-stone-900 text-stone-800 dark:text-stone-200 font-plus-jakarta-sans antialiased docked w-full top-0 sticky border-b border-stone-200 dark:border-stone-800 flat no shadows z-50">
+<div class="flex justify-between items-center h-16 px-6 md:px-12 max-w-[1120px] mx-auto">
+<div class="text-xl font-bold tracking-tight text-stone-900 dark:text-stone-50">The Journal</div>
+<div class="hidden md:flex items-center space-x-8">
+<a class="text-stone-900 dark:text-stone-50 border-b-2 border-stone-800 dark:border-stone-200 pb-1 hover:text-stone-900 dark:hover:text-stone-50 transition-colors duration-300 scale-95 duration-150 ease-in-out" href="#">에세이</a>
+<a class="text-stone-500 dark:text-stone-400 font-medium label-md hover:text-stone-900 dark:hover:text-stone-50 transition-colors duration-300 scale-95 duration-150 ease-in-out" href="#">아카이브</a>
+<a class="text-stone-500 dark:text-stone-400 font-medium label-md hover:text-stone-900 dark:hover:text-stone-50 transition-colors duration-300 scale-95 duration-150 ease-in-out" href="#">소개</a>
+</div>
+<div class="flex items-center space-x-4">
+<button class="hover:text-stone-900 dark:hover:text-stone-50 transition-colors duration-300">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+</button>
+<button class="hover:text-stone-900 dark:hover:text-stone-50 transition-colors duration-300">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+</button>
+</div>
+</div>
+</nav>
+<!-- Main Content: Split Layout -->
+<main class="min-h-screen flex flex-col md:flex-row">
+<!-- Left Section: Immersive Image -->
+<section class="w-full md:w-1/2 h-[512px] md:h-screen md:sticky md:top-0">
+<img alt="Digital Minimalist Workspace" class="w-full h-full object-cover" data-alt="Minimalist desk with a single ceramic cup, a notebook, and a linen cloth in soft morning light, muted beige tones, high-end editorial photography style" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB7NGbsO5wL0IBrTs3ZD30mhYkvI0N9iQvmmDI6LZLLkPcTkoVexf4OpuuGo0BP-boGA88p1kjqdwaxZ27ohHzWmQjhSvnM6KSb-nt-jQTwiWpGqy6R_i8qQrYngmh-6oE8uCSdpUbhQA6NL7NSh1n-JwzF9uOM1ptlFZJL5dx8Rxwag0mR0lqFGUXh-qIzDiN6enqJDLkadqyoPXV7AtXZVEmTtA7jG6vjBbU1WyHJzdPUQMEH-rdYZdI4eaDehOWylrKpssvAb_Ck"/>
+</section>
+<!-- Right Section: Content -->
+<section class="w-full md:w-1/2 bg-surface px-6 md:px-12 py-12 md:py-xl overflow-y-auto">
+<div class="max-w-2xl mx-auto">
+<!-- Article Meta -->
+<div class="mb-sm">
+<span class="font-label-md text-label-md text-secondary uppercase tracking-widest">철학</span>
+</div>
+<!-- Article Title -->
+<h1 class="font-display text-display text-on-surface mb-lg">디지털 의도성을 향한 고요한 여정</h1>
+<!-- Author & Date -->
+<div class="flex items-center space-x-4 mb-xl text-on-surface-variant">
+<div class="w-10 h-10 rounded-full bg-surface-container overflow-hidden">
+<img alt="Author Profile" data-alt="Close-up portrait of a thoughtful woman with minimalist aesthetic, soft lighting, neutral background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAJh-WloLLxE7y98RLC9jDkcIgfASYOTotTolkL3OtdALHF_MMDcJmUvVH53cdChnhq-KFES5tL4RJCLnmYIzY58Pk5qsXCDPVfToIjOUeDq0SJc6JdTWnIOWC1X9nxFY_q-dha6K735_dtvEAqmAjcFzhi_o_E2IWRo388Ep-nXzdNxZQpYSgKHW3h9ksW_Bd__AZxwEa63lNnh-omLYlmTgXjVM44aiNlCrxSgiZVwZhZpHPZi50EDQhsIUdLb0dT4wm2wKGWEs0y"/>
+</div>
+<div>
+<p class="font-label-md text-label-md font-semibold text-on-surface">에블린 쏜</p>
+<p class="font-label-md text-[12px] opacity-70 uppercase tracking-tighter">2024년 3월 14일 • 8분 읽기</p>
+</div>
+</div>
+<!-- Content Flow -->
+<div class="space-y-sm text-on-surface-variant font-body-lg text-body-lg">
+<p class="first-letter:text-5xl first-letter:font-display first-letter:mr-2 first-letter:float-left first-letter:text-secondary">끊임없는 알림의 소음과 무한 스크롤이 정의하는 시대에서, 한 걸음 뒤로 물러나는 행위는 이제 급진적인 필수 요소가 되었습니다. 디지털 의도성이란 기술을 전면적으로 거부하는 것이 아니라, 우리의 디지털 서식지를 의도적으로 큐레이팅하는 것을 의미합니다.</p>
+<p>우리는 종종 디지털 세계와 상호작용하기보다는 반응하며 살아갑니다. 주머니 속의 모든 진동은 우리의 주의력을 요구하는 신호이며, 우리의 집중력은 그 거래의 화폐가 됩니다. 이러한 집중력을 되찾기 위해, 우리는 먼저 우리의 효용 범위를 넘어 계속 머물게 하도록 설계된 건축적 넛지(nudges)를 인식해야 합니다.</p>
+<h2 class="font-h2 text-h2 text-on-surface mt-lg mb-sm">침묵의 안식처</h2>
+<p>디지털 안식처를 만드는 것은 물리적 환경에서부터 시작됩니다. 식탁, 침대 머리맡, 아침 커피를 마시는 구석진 곳 등 기술이 없는 구역을 지정할 때, 우리는 외부의 입력이 없는 상태에서만 떠오르는 생각들을 위한 공간을 만들 수 있습니다.</p>
+<blockquote class="border-l-2 border-secondary pl-6 my-lg italic font-body-lg text-on-secondary-container">"가장 깊은 연결은 종종 네트워크에서 연결이 끊기고 바로 옆에 있는 것들과 다시 연결될 때 일어납니다."</blockquote>
+<p>의도성은 우리에게 스스로 묻기를 요구합니다. '이 도구가 나를 섬기는가, 아니면 내가 도구를 섬기는가?' 비판적인 시각으로 디지털 도구들을 점검함으로써, 우리는 수동적인 소비에서 능동적인 참여로 나아갈 수 있습니다. 우리는 어지러운 노트 앱 대신 고급 종이 저널을 선택하고, 140자의 요약 대신 긴 에세이를 선택합니다.</p>
+</div>
+<!-- Action Footer -->
+<div class="mt-xl pt-lg border-t border-outline-variant flex flex-wrap items-center justify-between gap-sm">
+<div class="flex items-center space-x-4">
+<button class="flex items-center space-x-2 bg-secondary text-on-primary px-sm py-xs rounded-lg hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined text-[20px]" data-icon="edit">edit</span>
+<span class="font-label-md text-label-md">게시글 수정</span>
+</button>
+<button class="flex items-center space-x-2 border border-secondary text-secondary px-sm py-xs rounded-lg hover:bg-secondary-container transition-colors">
+<span class="material-symbols-outlined text-[20px]" data-icon="share">share</span>
+<span class="font-label-md text-label-md">기사 공유</span>
+</button>
+</div>
+<div class="flex items-center space-x-6 text-on-surface-variant">
+<button class="flex items-center space-x-1 hover:text-secondary transition-colors">
+<span class="material-symbols-outlined" data-icon="favorite">favorite</span>
+<span class="font-label-md text-label-md">124</span>
+</button>
+<button class="flex items-center space-x-1 hover:text-secondary transition-colors">
+<span class="material-symbols-outlined" data-icon="bookmark">bookmark</span>
+</button>
+</div>
+</div>
+<!-- Tags Section -->
+<div class="mt-lg flex flex-wrap gap-xs">
+<span class="px-sm py-1 bg-primary-container text-on-primary-container rounded-full font-label-md text-[12px] uppercase">슬로우 리빙</span>
+<span class="px-sm py-1 bg-primary-container text-on-primary-container rounded-full font-label-md text-[12px] uppercase">마음챙김</span>
+<span class="px-sm py-1 bg-primary-container text-on-primary-container rounded-full font-label-md text-[12px] uppercase">테크놀로지</span>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-[#F5F5DC] dark:bg-stone-900 text-stone-800 dark:text-stone-200 font-plus-jakarta-sans text-sm w-full mt-24 border-t border-stone-200 dark:border-stone-800 flat no shadows">
+<div class="max-w-[1120px] mx-auto py-12 px-6 md:px-12 flex flex-col md:flex-row justify-between items-center gap-6">
+<div class="text-lg font-bold text-stone-800 dark:text-stone-200">The Journal</div>
+<div class="flex space-x-8 opacity-80">
+<a class="text-stone-500 dark:text-stone-400 hover:underline decoration-stone-300 underline-offset-4 transition-opacity" href="#">개인정보처리방침</a>
+<a class="text-stone-500 dark:text-stone-400 hover:underline decoration-stone-300 underline-offset-4 transition-opacity" href="#">이용약관</a>
+<a class="text-stone-500 dark:text-stone-400 hover:underline decoration-stone-300 underline-offset-4 transition-opacity" href="#">© 2024 Digital Slow Living. 모든 권리 보유.</a>
+</div>
+<div class="text-stone-500 dark:text-stone-400">© 2024 Digital Slow Living. 모든 권리 보유.</div>
+</div>
+</footer>
+</body></html>

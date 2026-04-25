@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% block title %}{{ post['title'] }}{% endblock %}
+{% block content %}
+  {% set excerpt = post['content'][:68] ~ ('...' if post['content']|length > 68 else '') %}
+  {% set read_minutes = (post['content']|length // 450) + 1 %}
+
+  <main class="max-w-[1120px] mx-auto px-6 md:px-12 py-xl">
+    <div class="mb-md flex flex-wrap items-center gap-2">
+      <a href="{{ url_for('show_post', post_id=post['id'], view='sidebar') }}" class="px-3 py-1 rounded-full border text-xs {{ 'bg-secondary text-white border-secondary' if view == 'sidebar' else 'border-outline-variant text-stone-500' }}">Sidebar</a>
+      <a href="{{ url_for('show_post', post_id=post['id'], view='center') }}" class="px-3 py-1 rounded-full border text-xs {{ 'bg-secondary text-white border-secondary' if view == 'center' else 'border-outline-variant text-stone-500' }}">Center</a>
+      <a href="{{ url_for('show_post', post_id=post['id'], view='split') }}" class="px-3 py-1 rounded-full border text-xs {{ 'bg-secondary text-white border-secondary' if view == 'split' else 'border-outline-variant text-stone-500' }}">Split</a>
+    </div>
+
+    {% if view == 'center' %}
+      <article class="max-w-[760px] mx-auto">
+        <header class="text-center mb-lg">
+          <div class="inline-block bg-primary-container px-3 py-1 rounded-full mb-sm">
+            <span class="font-label-md text-label-md text-on-primary-container">철학</span>
+          </div>
+          <h1 class="font-display text-display text-on-surface mb-md">{{ post['title'] }}</h1>
+          <div class="flex items-center justify-center gap-4 text-outline font-label-md text-label-md">
+            <span>{{ post['created_at'] }}</span>
+            <span class="w-1 h-1 bg-outline-variant rounded-full"></span>
+            <span>{{ read_minutes }}분 분량</span>
+          </div>
+        </header>
+
+        <figure class="mb-lg rounded-xl overflow-hidden bg-surface-container">
+          <img class="w-full aspect-[16/9] object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBDzLAyp4aWT53mpPjHRmx88eFvkEUjV34E94PhlVvlzjK7nedIeaFvGGj4mflqqSEVM847M_0m7e8g_UP9eKEI-mh188mchr4dqMYIp0dXeIhGsDXcr9EU0rqsmazl2woPkdnA_oR2olXHmqZO4KVh_BFdn0iCDgk0-wuxnRWOIDQdE-q6oXa2IortjaJbHleWPTFN2OyFAhusYpwTI2dgM-LdIjjkQfDixzf6zQ6QHUHqciaMsrHuiPVy1Lro9SojKu0iVw-0WsCU" alt="Hero image" />
+          <figcaption class="p-sm text-center font-label-md text-label-md text-stone-500 italic">생각을 위한 공간은 화면이 끝나는 지점에서 시작됩니다.</figcaption>
+        </figure>
+
+        <div class="prose max-w-none font-body-lg text-body-lg text-on-surface leading-relaxed">
+          {% for paragraph in post['content'].split('\n') if paragraph.strip() %}
+            <p>{{ paragraph }}</p>
+          {% endfor %}
+          <blockquote class="my-lg py-lg px-md bg-surface-container-low rounded-xl border-l-4 border-secondary text-on-secondary-container font-h2 text-h2 italic">"고요한 마음의 아름다움은 세상이 자신의 시간에 맞춰 당신에게 다시 말을 걸 수 있게 해준다는 점에 있습니다."</blockquote>
+        </div>
+      </article>
+
+    {% elif view == 'split' %}
+      <article class="grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-lg items-start">
+        <section class="rounded-xl overflow-hidden bg-surface-container sticky top-24">
+          <img class="w-full h-[620px] object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB7NGbsO5wL0IBrTs3ZD30mhYkvI0N9iQvmmDI6LZLLkPcTkoVexf4OpuuGo0BP-boGA88p1kjqdwaxZ27ohHzWmQjhSvnM6KSb-nt-jQTwiWpGqy6R_i8qQrYngmh-6oE8uCSdpUbhQA6NL7NSh1n-JwzF9uOM1ptlFZJL5dx8Rxwag0mR0lqFGUXh-qIzDiN6enqJDLkadqyoPXV7AtXZVEmTtA7jG6vjBbU1WyHJzdPUQMEH-rdYZdI4eaDehOWylrKpssvAb_Ck" alt="Split hero" />
+        </section>
+
+        <section class="bg-surface-container-low rounded-xl border border-outline-variant/60 p-md">
+          <div class="mb-sm"><span class="font-label-md text-label-md text-secondary uppercase tracking-widest">기록</span></div>
+          <h1 class="font-h1 text-h1 text-on-surface mb-sm leading-tight">{{ post['title'] }}</h1>
+          <div class="flex items-center gap-3 text-stone-500 text-sm mb-md">
+            <span>{{ post['created_at'] }}</span><span>•</span><span>{{ read_minutes }}분</span>
+          </div>
+
+          <div class="prose max-w-none font-body-md text-body-md text-on-surface-variant leading-relaxed">
+            {% for paragraph in post['content'].split('\n') if paragraph.strip() %}
+              <p>{{ paragraph }}</p>
+            {% endfor %}
+          </div>
+        </section>
+      </article>
+
+    {% else %}
+      <article class="flex flex-col lg:flex-row gap-lg">
+        <aside class="w-full lg:w-64 flex-shrink-0 lg:border-r border-stone-200 lg:pr-8 mb-lg lg:mb-0">
+          <div class="sticky top-24 space-y-lg">
+            <div class="space-y-4">
+              <div>
+                <span class="font-label-md text-label-md text-stone-400 uppercase tracking-widest block mb-2">작가</span>
+                <div class="flex items-center gap-3">
+                  <img alt="Author avatar" class="w-10 h-10 rounded-full grayscale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAgeKCD3z71hndm9VAR2o4NwppF5EycwD5o__eJpVBaFv6RgiJTJOSp2D-HgRzfhSGPN-JA66AiGnj6j0tW9eu2-TvJh5qCnO_7rTQ3-7G8uY6sBHv8jX9yedZdH0khTFuP63q-7aoBd-0z_SDdQVhRNBRlGH5mJz631Q_MutEb8h8SrWYA2v5Cop1Ba-4xbveIdn0JBH-Tbjx__ZvHZnJ9hJIrSazRUCxJRolGAQXPBkX53r1Vclxp50e27SUQKr6-Zg5yk1W4HwGh" />
+                  <p class="font-h2 text-body-md font-semibold text-on-surface">Julian V.</p>
+                </div>
+              </div>
+              <div>
+                <span class="font-label-md text-label-md text-stone-400 uppercase tracking-widest block mb-1">날짜</span>
+                <p class="font-body-md text-on-surface">{{ post['created_at'] }}</p>
+              </div>
+              <div>
+                <span class="font-label-md text-label-md text-stone-400 uppercase tracking-widest block mb-1">읽는 시간</span>
+                <p class="font-body-md text-on-surface">{{ read_minutes }}분</p>
+              </div>
+            </div>
+
+            <div class="space-y-4 pt-lg border-t border-stone-100">
+              <span class="font-label-md text-label-md text-stone-400 uppercase tracking-widest block">빠른 링크</span>
+              <ul class="space-y-3">
+                <li><a class="font-label-md text-label-md text-stone-600 hover:text-secondary transition-colors" href="#section-1">소음 문제</a></li>
+                <li><a class="font-label-md text-label-md text-stone-600 hover:text-secondary transition-colors" href="#section-2">디지털 리추얼</a></li>
+                <li><a class="font-label-md text-label-md text-stone-600 hover:text-secondary transition-colors" href="#section-3">공간 만들기</a></li>
+              </ul>
+            </div>
+          </div>
+        </aside>
+
+        <div class="flex-1">
+          <header class="mb-lg">
+            <div class="inline-block bg-primary-container px-3 py-1 rounded-full mb-sm">
+              <span class="font-label-md text-label-md text-on-primary-container">철학</span>
+            </div>
+            <h1 class="font-display text-display text-on-surface mb-md">{{ post['title'] }}</h1>
+            <p class="font-body-lg text-body-lg text-on-surface-variant italic border-l-2 border-primary pl-6 py-2">{{ excerpt }}</p>
+          </header>
+
+          <figure class="mb-lg rounded-xl overflow-hidden bg-surface-container">
+            <img alt="Article hero" class="w-full aspect-[16/9] object-cover mix-blend-multiply opacity-90" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBBu13kVIHFaZnpwpWGoP8LCICwn0uVyf8RyXfnkfGspqKd-1R93YAXeFrrgHrkST3b9RHujYY6gGiL5Xvv_quyTHv-KUDY8aDr-nAglWZzzU-DIlRtF_sceVKVMgGi-5LbeGOlQvos8VsCUSwOqJ2Jdf4ipdLOPwXFB4y3xLHkuDw84K0YVkFwl4dt5pi_ACJtZw8zccJrS69j64E7VjJ8Dsi7J2jL-uYPZWVIY4p0t6aigrBVteNwtyUd_qiqU6X9gHIMWFehvw70" />
+            <figcaption class="p-sm text-center font-label-md text-label-md text-stone-500 italic">생각을 위한 공간은 화면이 끝나는 지점에서 시작됩니다.</figcaption>
+          </figure>
+
+          <div class="prose max-w-none font-body-lg text-body-lg text-on-surface leading-relaxed">
+            {% set ns = namespace(i=0) %}
+            {% for paragraph in post['content'].split('\n') %}
+              {% if paragraph.strip() %}
+                {% set ns.i = ns.i + 1 %}
+                {% if ns.i == 2 %}<h2 id="section-1" class="font-h1 text-h1 text-on-surface">침묵의 구조</h2>{% endif %}
+                {% if ns.i == 4 %}
+                  <blockquote class="my-lg py-lg px-md bg-surface-container-low rounded-xl border-l-4 border-secondary text-on-secondary-container font-h2 text-h2 italic">"우리는 평화를 찾는 것이 아닙니다. 우리가 주의를 기울이기로 선택한 벽을 통해 평화를 구축하는 것입니다."</blockquote>
+                  <h2 id="section-2" class="font-h1 text-h1 text-on-surface">새로운 리추얼 만들기</h2>
+                {% endif %}
+                {% if ns.i == 6 %}<h2 id="section-3" class="font-h1 text-h1 text-on-surface">집중의 공간</h2>{% endif %}
+                <p>{{ paragraph }}</p>
+              {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+      </article>
+    {% endif %}
+  </main>
+{% endblock %}

@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}게시글 목록{% endblock %}
+{% block content %}
+  <main class="max-w-[1120px] mx-auto px-6 md:px-12 py-xl">
+    <div class="mb-md flex flex-wrap items-center gap-2">
+      <a href="{{ url_for('list_posts', view='sidebar') }}" class="px-3 py-1 rounded-full border text-xs {{ 'bg-secondary text-white border-secondary' if view == 'sidebar' else 'border-outline-variant text-stone-500' }}">Sidebar</a>
+      <a href="{{ url_for('list_posts', view='center') }}" class="px-3 py-1 rounded-full border text-xs {{ 'bg-secondary text-white border-secondary' if view == 'center' else 'border-outline-variant text-stone-500' }}">Center</a>
+      <a href="{{ url_for('list_posts', view='split') }}" class="px-3 py-1 rounded-full border text-xs {{ 'bg-secondary text-white border-secondary' if view == 'split' else 'border-outline-variant text-stone-500' }}">Split</a>
+    </div>
+
+    {% if posts %}
+      {% if view == 'center' %}
+        <section class="list-center-layout max-w-[760px] mx-auto">
+          <header class="text-center mb-lg">
+            <h1 class="font-display text-display text-on-surface mb-sm">디지털 저널 아카이브</h1>
+            <p class="font-body-lg text-body-lg text-on-surface-variant">중앙 집중형 편집 레이아웃</p>
+          </header>
+          <div class="space-y-md">
+            {% for post in posts %}
+              <article class="bg-surface-container-low rounded-xl border border-outline-variant/70 p-md text-left">
+                <div class="text-sm text-stone-500 mb-xs">{{ post['created_at'] }}</div>
+                <h2 class="font-h1 text-h1 text-on-surface mb-sm leading-tight">
+                  <a href="{{ url_for('show_post', post_id=post['id']) }}" class="hover:text-secondary transition-colors">{{ post['title'] }}</a>
+                </h2>
+                <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">{{ post['content'][:180] }}{% if post['content']|length > 180 %}...{% endif %}</p>
+              </article>
+            {% endfor %}
+          </div>
+        </section>
+
+      {% elif view == 'split' %}
+        <section class="list-split-layout grid grid-cols-1 lg:grid-cols-2 gap-md">
+          {% for post in posts %}
+            <article class="grid grid-cols-[140px_1fr] bg-surface-container-low rounded-xl overflow-hidden border border-outline-variant/70">
+              <div class="bg-gradient-to-br from-[#282622] via-[#42403b] to-[#6b6a61]"></div>
+              <div class="p-md">
+                <div class="text-sm text-stone-500 mb-xs">{{ post['created_at'] }}</div>
+                <h2 class="font-h1 text-h1 text-on-surface mb-sm leading-tight">
+                  <a href="{{ url_for('show_post', post_id=post['id']) }}" class="hover:text-secondary transition-colors">{{ post['title'] }}</a>
+                </h2>
+                <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">{{ post['content'][:130] }}{% if post['content']|length > 130 %}...{% endif %}</p>
+              </div>
+            </article>
+          {% endfor %}
+        </section>
+
+      {% else %}
+        <section class="list-sidebar-layout">
+          <header class="mb-lg">
+            <h1 class="font-display text-display text-on-surface mb-sm">디지털 저널 아카이브</h1>
+            <p class="font-body-lg text-body-lg text-on-surface-variant">사이드바형 에디토리얼 레이아웃</p>
+          </header>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+            {% for post in posts %}
+              <article class="bg-surface-container-low rounded-xl border border-outline-variant/70 p-md hover:shadow-sm transition-shadow duration-300">
+                <div class="inline-block bg-primary-container px-3 py-1 rounded-full mb-sm">
+                  <span class="font-label-md text-label-md text-on-primary-container">POST #{{ post['id'] }}</span>
+                </div>
+                <h2 class="font-h1 text-h1 text-on-surface mb-xs leading-tight">
+                  <a href="{{ url_for('show_post', post_id=post['id']) }}" class="hover:text-secondary transition-colors">{{ post['title'] }}</a>
+                </h2>
+                <p class="font-label-md text-label-md text-stone-500 mb-sm">{{ post['created_at'] }}</p>
+                <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">{{ post['content'][:180] }}{% if post['content']|length > 180 %}...{% endif %}</p>
+                <div class="mt-md">
+                  <a href="{{ url_for('show_post', post_id=post['id']) }}" class="inline-flex items-center gap-2 text-secondary font-label-md text-label-md hover:underline underline-offset-4">
+                    자세히 읽기
+                    <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+                  </a>
+                </div>
+              </article>
+            {% endfor %}
+          </div>
+        </section>
+      {% endif %}
+
+    {% else %}
+      <section class="bg-surface-container-low rounded-xl border border-outline-variant/70 p-xl text-center">
+        <h2 class="font-h1 text-h1 text-on-surface mb-sm">아직 게시글이 없습니다</h2>
+        <p class="font-body-md text-body-md text-on-surface-variant mb-md">첫 번째 글을 작성해 공간을 채워보세요.</p>
+        <a href="{{ url_for('write_post') }}" class="inline-flex items-center gap-2 bg-secondary text-white px-md py-sm rounded-lg font-label-md text-label-md hover:opacity-90 transition-opacity">
+          <span class="material-symbols-outlined text-[20px]">edit</span>
+          글쓰기
+        </a>
+      </section>
+    {% endif %}
+  </main>
+{% endblock %}
