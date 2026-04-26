@@ -1907,5 +1907,46 @@ def seed():
     print(f"Seeded {count} posts.")
 
 
+def seed_news():
+    from crawler import fetch_rss, parse_items, RSS_URL
+
+    conn = sqlite3.connect("board.db")
+
+    try:
+        soup = fetch_rss(RSS_URL)
+    except Exception as e:
+        print(f"뉴스 가져오기 실패: {e}")
+        conn.close()
+        return
+
+    items = parse_items(soup)
+    added = 0
+
+    for item in items:
+        exists = conn.execute(
+            "SELECT 1 FROM posts WHERE title = ?", (item["title"],)
+        ).fetchone()
+        if exists:
+            continue
+
+        conn.execute(
+            "INSERT INTO posts (title, content, created_at, category, image_url) VALUES (?, ?, ?, ?, ?)",
+            (
+                item["title"],
+                f"{item['description']}\n\n{item['link']}",
+                item["pub_date"] if item["pub_date"] != "N/A" else datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "뉴스",
+                "",
+            ),
+        )
+        added += 1
+        print(f"  + {item['title']}")
+
+    conn.commit()
+    conn.close()
+    print(f"뉴스 {added}건 추가됨 (중복 제외 {len(items) - added}건)")
+
+
 if __name__ == "__main__":
     seed()
+    seed_news()

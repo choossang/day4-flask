@@ -2,7 +2,11 @@ import os
 import sqlite3
 import uuid
 from datetime import datetime
+import html as html_mod
+import re
 
+import requests as http_requests
+from bs4 import BeautifulSoup
 from flask import Flask, abort, redirect, render_template, request, url_for
 
 app = Flask(__name__)
@@ -267,6 +271,46 @@ def write_post():
         image_url="",
         categories=CATEGORIES,
     )
+
+
+@app.route("/news")
+def news():
+    url = "https://news.google.com/rss?hl=ko&gl=KR&ceid=KR:ko"
+    try:
+        resp = http_requests.get(url, timeout=10)
+        resp.raise_for_status()
+        soup = BeautifulSoup(resp.content, "xml")
+    except Exception:
+        return render_template("news.html", items=[], error="뉴스를 가져오지 못했습니다.")
+
+    items = []
+    for item in soup.find_all("item")[:10]:
+        pub_date = item.find("pubDate")
+        pub_date_text = pub_date.get_text(strip=True) if pub_date else ""
+        try:
+            dt = datetime.strptime(pub_date_text, "%a, %d %b %Y %H:%M:%S GMT")
+            pub_date_text = dt.strftime("%Y-%m-%d %H:%M")
+        except (ValueError, TypeError):
+            pass
+
+        desc_raw = item.find("description").get_text(strip=True) if item.find("description") else ""
+        desc_clean = html_mod.unescape(re.sub(r"<[^>]+>", "", desc_raw)).replace("\xa0", " ")
+
+        items.append({
+            "title": item.find("title").get_text(strip=True) if item.find("title") else "",
+            "link": item.find("link").get_text(strip=True) if item.find("link") else "",
+            "description": desc_clean[:120],
+            "pub_date": pub_date_text,
+        })
+
+    for i, it in enumerate(items, 1):
+        print(f"[{i}] {it['title']}")
+        print(f"    {it['pub_date']}")
+        print(f"    {it['link']}")
+        print(f"    {it['description'][:80]}...")
+        print()
+
+    return render_template("news.html", items=items, error=None)
 
 
 if __name__ == "__main__":
