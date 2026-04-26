@@ -1,10 +1,39 @@
+import hashlib
+import os
 import sqlite3
+import uuid
 from datetime import datetime
 
-from flask import Flask, abort, redirect, render_template, request, url_for
+from flask import Flask, abort, redirect, render_template, request, session, url_for
 
 app = Flask(__name__)
 app.config.setdefault("DATABASE", "board.db")
+app.secret_key = os.environ.get("SECRET_KEY", "dev-secret-change-in-production")
+
+ADMIN_PASSWORD_HASH = hashlib.sha256(
+    os.environ.get("ADMIN_PASSWORD", "120715").encode()
+).hexdigest()
+
+
+def is_authenticated():
+    return session.get("auth") == ADMIN_PASSWORD_HASH
+
+UPLOAD_FOLDER = os.path.join(app.static_folder, "uploads")
+ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "webp"}
+
+
+def allowed_file(filename):
+    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+def save_upload(file):
+    if file and file.filename and allowed_file(file.filename):
+        ext = file.filename.rsplit(".", 1)[1].lower()
+        filename = f"{uuid.uuid4().hex[:12]}.{ext}"
+        os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+        file.save(os.path.join(UPLOAD_FOLDER, filename))
+        return url_for("static", filename=f"uploads/{filename}")
+    return ""
 
 
 def init_db_if_needed():
@@ -19,7 +48,9 @@ def init_db_if_needed():
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 title TEXT NOT NULL,
                 content TEXT NOT NULL,
-                created_at TEXT NOT NULL
+                created_at TEXT NOT NULL,
+                category TEXT NOT NULL DEFAULT '',
+                image_url TEXT NOT NULL DEFAULT ''
             )
             """
         )
@@ -41,7 +72,9 @@ def init_db():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             title TEXT NOT NULL,
             content TEXT NOT NULL,
-            created_at TEXT NOT NULL
+            created_at TEXT NOT NULL,
+            category TEXT NOT NULL DEFAULT '',
+            image_url TEXT NOT NULL DEFAULT ''
         )
         """
     )
@@ -54,26 +87,82 @@ def ensure_schema():
     init_db_if_needed()
 
 
+PER_PAGE = 10
+
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    error = None
+    if request.method == "POST":
+        pw = request.form.get("password", "")
+        if hashlib.sha256(pw.encode()).hexdigest() == ADMIN_PASSWORD_HASH:
+            session["auth"] = ADMIN_PASSWORD_HASH
+            return redirect(request.args.get("next", url_for("list_posts")))
+        error = "비밀번호가 틀렸습니다"
+    return render_template("login.html", error=error)
+
+
+@app.route("/logout")
+def logout():
+    session.pop("auth", None)
+    return redirect(url_for("list_posts"))
+CATEGORIES = [
+    "인사·만남", "카페·식당", "교통·이동", "쇼핑", "병원·건강",
+    "금융·업무", "일상대화", "숙박·여행", "직장·비즈니스", "학교·교육",
+    "관광·여가", "일상생활", "공항·여행", "긴급상황",
+]
+SORT_OPTIONS = {"latest": "id DESC", "oldest": "id ASC", "title": "title ASC"}
+
+
 @app.route("/")
 def list_posts():
-    conn = get_connection()
-    posts = conn.execute(
-        "SELECT id, title, content, created_at FROM posts ORDER BY id DESC"
-    ).fetchall()
-    conn.close()
-
+    page = request.args.get("page", 1, type=int)
     view = request.args.get("view", "sidebar")
     if view not in {"sidebar", "center", "split"}:
         view = "sidebar"
+    query = request.args.get("q", "").strip()
+    sort = request.args.get("sort", "latest")
+    if sort not in SORT_OPTIONS:
+        sort = "latest"
+    order_by = SORT_OPTIONS[sort]
 
-    return render_template("list.html", posts=posts, view=view)
+    conn = get_connection()
+    if query:
+        like = f"%{query}%"
+        total = conn.execute(
+            "SELECT COUNT(*) FROM posts WHERE title LIKE ? OR content LIKE ?",
+            (like, like),
+        ).fetchone()[0]
+        posts = conn.execute(
+            f"SELECT * FROM posts WHERE title LIKE ? OR content LIKE ? ORDER BY {order_by} LIMIT ? OFFSET ?",
+            (like, like, PER_PAGE, (page - 1) * PER_PAGE),
+        ).fetchall()
+    else:
+        total = conn.execute("SELECT COUNT(*) FROM posts").fetchone()[0]
+        posts = conn.execute(
+            f"SELECT * FROM posts ORDER BY {order_by} LIMIT ? OFFSET ?",
+            (PER_PAGE, (page - 1) * PER_PAGE),
+        ).fetchall()
+    conn.close()
+
+    total_pages = max(1, (total + PER_PAGE - 1) // PER_PAGE)
+
+    return render_template(
+        "list.html",
+        posts=posts,
+        view=view,
+        page=page,
+        total_pages=total_pages,
+        query=query,
+        sort=sort,
+    )
 
 
 @app.route("/posts/<int:post_id>")
 def show_post(post_id: int):
     conn = get_connection()
     post = conn.execute(
-        "SELECT id, title, content, created_at FROM posts WHERE id = ?",
+        "SELECT * FROM posts WHERE id = ?",
         (post_id,),
     ).fetchone()
     conn.close()
@@ -85,14 +174,16 @@ def show_post(post_id: int):
     if view not in {"sidebar", "center", "split"}:
         view = "sidebar"
 
-    return render_template("detail.html", post=post, view=view)
+    return render_template("detail.html", post=post, view=view, is_admin=is_authenticated())
 
 
 @app.route("/posts/<int:post_id>/edit", methods=["GET", "POST"])
 def edit_post(post_id: int):
+    if not is_authenticated():
+        return redirect(url_for("login", next=request.url))
     conn = get_connection()
     post = conn.execute(
-        "SELECT id, title, content, created_at FROM posts WHERE id = ?",
+        "SELECT * FROM posts WHERE id = ?",
         (post_id,),
     ).fetchone()
 
@@ -103,6 +194,8 @@ def edit_post(post_id: int):
     if request.method == "POST":
         title = request.form.get("title", "").strip()
         content = request.form.get("content", "").strip()
+        category = request.form.get("category", "").strip()
+        image_url = post["image_url"]
 
         if not title or not content:
             conn.close()
@@ -111,13 +204,22 @@ def edit_post(post_id: int):
                 error="제목과 본문을 입력해주세요",
                 title=title,
                 content=content,
+                category=category,
+                image_url=image_url,
                 form_action=url_for("edit_post", post_id=post_id),
                 form_title="글 수정",
+                categories=CATEGORIES,
             )
 
+        file = request.files.get("image")
+        if file and file.filename:
+            uploaded = save_upload(file)
+            if uploaded:
+                image_url = uploaded
+
         conn.execute(
-            "UPDATE posts SET title = ?, content = ? WHERE id = ?",
-            (title, content, post_id),
+            "UPDATE posts SET title = ?, content = ?, category = ?, image_url = ? WHERE id = ?",
+            (title, content, category, image_url, post_id),
         )
         conn.commit()
         conn.close()
@@ -129,13 +231,18 @@ def edit_post(post_id: int):
         error=None,
         title=post["title"],
         content=post["content"],
+        category=post["category"],
+        image_url=post["image_url"],
         form_action=url_for("edit_post", post_id=post_id),
         form_title="글 수정",
+        categories=CATEGORIES,
     )
 
 
 @app.route("/posts/<int:post_id>/delete", methods=["POST"])
 def delete_post(post_id: int):
+    if not is_authenticated():
+        return redirect(url_for("login", next=url_for("list_posts")))
     conn = get_connection()
     conn.execute("DELETE FROM posts WHERE id = ?", (post_id,))
     conn.commit()
@@ -145,21 +252,39 @@ def delete_post(post_id: int):
 
 @app.route("/write", methods=["GET", "POST"])
 def write_post():
+    if not is_authenticated():
+        return redirect(url_for("login", next=request.url))
     error = None
 
     if request.method == "POST":
         title = request.form.get("title", "").strip()
         content = request.form.get("content", "").strip()
+        category = request.form.get("category", "").strip()
+        image_url = ""
 
         if not title or not content:
             error = "제목과 본문을 입력해주세요"
-            return render_template("write.html", error=error, title=title, content=content)
+            return render_template(
+                "write.html",
+                error=error,
+                title=title,
+                content=content,
+                category=category,
+                image_url=image_url,
+                categories=CATEGORIES,
+            )
+
+        file = request.files.get("image")
+        if file and file.filename:
+            uploaded = save_upload(file)
+            if uploaded:
+                image_url = uploaded
 
         created_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         conn = get_connection()
         conn.execute(
-            "INSERT INTO posts (title, content, created_at) VALUES (?, ?, ?)",
-            (title, content, created_at),
+            "INSERT INTO posts (title, content, created_at, category, image_url) VALUES (?, ?, ?, ?, ?)",
+            (title, content, created_at, category, image_url),
         )
         post_id = conn.execute("SELECT last_insert_rowid()").fetchone()[0]
         conn.commit()
@@ -167,7 +292,15 @@ def write_post():
 
         return redirect(url_for("show_post", post_id=post_id))
 
-    return render_template("write.html", error=error, title="", content="")
+    return render_template(
+        "write.html",
+        error=error,
+        title="",
+        content="",
+        category="",
+        image_url="",
+        categories=CATEGORIES,
+    )
 
 
 if __name__ == "__main__":

@@ -96,34 +96,29 @@
         font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
       }
       .prose p {
-        margin-bottom: 1.5rem;
-      }
-      .prose h2 {
-        margin-top: 2.5rem;
         margin-bottom: 1rem;
       }
     </style>
-    <title>{% block title %}Warm Journal{% endblock %}</title>
+    <title>{% block title %}중국어 일상회화{% endblock %}</title>
   </head>
   <body class="bg-background text-on-background font-body-md antialiased">
     <header class="w-full top-0 sticky z-50 bg-[#F5F5DC] border-b border-stone-200 font-plus-jakarta-sans">
       <div class="max-w-[1120px] mx-auto flex justify-between items-center h-16 px-6 md:px-12">
-        <a class="text-xl font-bold tracking-tight text-stone-900" href="{{ url_for('list_posts') }}">The Journal</a>
+        <a class="text-xl font-bold tracking-tight text-stone-900" href="{{ url_for('list_posts') }}">중국어 회화</a>
         <nav class="hidden md:flex items-center gap-8">
-          <a class="text-stone-900 border-b-2 border-stone-800 pb-1 font-label-md text-label-md" href="{{ url_for('list_posts') }}">목록</a>
+          <a class="text-stone-500 font-medium font-label-md text-label-md hover:text-stone-900 transition-colors duration-300" href="{{ url_for('list_posts') }}">목록</a>
           <a class="text-stone-500 font-medium font-label-md text-label-md hover:text-stone-900 transition-colors duration-300" href="{{ url_for('write_post') }}">글쓰기</a>
         </nav>
-        <div class="flex items-center gap-4">
-          <span class="material-symbols-outlined text-stone-800">search</span>
-          <span class="material-symbols-outlined text-stone-800">account_circle</span>
+        <div class="flex items-center gap-3">
+          <a href="{{ url_for('logout') if session.get('auth') else url_for('login') }}" class="material-symbols-outlined text-stone-800 hover:text-secondary transition-colors cursor-pointer" title="{{ '로그아웃' if session.get('auth') else '로그인' }}">{{ 'logout' if session.get('auth') else 'login' }}</a>
         </div>
       </div>
     </header>
     {% block content %}{% endblock %}
     <footer class="w-full mt-24 bg-[#F5F5DC] border-t border-stone-200 font-plus-jakarta-sans text-sm">
       <div class="max-w-[1120px] mx-auto py-10 px-6 md:px-12 flex flex-col md:flex-row justify-between items-center gap-4">
-        <div class="text-lg font-bold text-stone-800">The Journal</div>
-        <div class="text-stone-500">© 2026 Warm Minimal Board</div>
+        <div class="text-lg font-bold text-stone-800">중국어 일상회화</div>
+        <div class="text-stone-500">© 2026 상황별 대화로 배우는 실전 중국어</div>
       </div>
     </footer>
   </body>

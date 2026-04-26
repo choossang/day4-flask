@@ -1,54 +1,83 @@
 {% extends "base.html" %}
 {% block title %}{{ form_title or '글쓰기' }}{% endblock %}
 {% block content %}
-  <main class="max-w-[1120px] mx-auto px-6 md:px-12 py-xl">
-    <section class="max-w-3xl mx-auto bg-surface-container-low rounded-xl border border-outline-variant p-6 md:p-8">
-      <div class="mb-md">
-        <h1 class="font-display text-display text-on-surface mb-sm">{{ form_title or '새 글 작성' }}</h1>
-        <p class="font-body-md text-body-md text-on-surface-variant">따뜻하고 차분한 톤으로 생각을 기록해 보세요.</p>
+  <main class="max-w-[760px] mx-auto px-6 md:px-12 py-xl">
+    <header class="mb-lg">
+      <a href="{{ url_for('list_posts') }}" class="inline-flex items-center gap-1 text-secondary font-label-md text-label-md mb-sm hover:underline underline-offset-4">
+        <span class="material-symbols-outlined text-[18px]">arrow_back</span> 목록으로
+      </a>
+      <h1 class="font-display text-display text-on-surface">{{ form_title or '새 글 작성' }}</h1>
+    </header>
+
+    {% if error %}
+      <div class="mb-md p-sm bg-error-container text-on-error-container rounded-lg text-sm">{{ error }}</div>
+    {% endif %}
+
+    <form method="post" action="{{ form_action or url_for('write_post') }}" enctype="multipart/form-data" class="space-y-md">
+      <div>
+        <label class="block font-label-md text-label-md text-stone-500 mb-xs">제목</label>
+        <input type="text" name="title" value="{{ title }}" placeholder="예: 카페에서 커피 주문" class="w-full px-3 py-2 rounded-lg border border-outline-variant/70 text-sm bg-surface-container-low focus:outline-none focus:border-secondary transition-colors">
       </div>
 
-      {% if error %}
-        <div class="mb-md rounded-lg border border-error/30 bg-error-container text-on-error-container px-4 py-3 font-label-md text-label-md">
-          {{ error }}
-        </div>
-      {% endif %}
+      <div>
+        <label class="block font-label-md text-label-md text-stone-500 mb-xs">카테고리</label>
+        <select name="category" class="w-full px-3 py-2 rounded-lg border border-outline-variant/70 text-sm bg-surface-container-low focus:outline-none focus:border-secondary transition-colors cursor-pointer">
+          <option value="">선택 안함</option>
+          {% for cat in categories %}
+            <option value="{{ cat }}" {{ 'selected' if category == cat }}>{{ cat }}</option>
+          {% endfor %}
+        </select>
+      </div>
 
-      <form method="post" action="{{ form_action or url_for('write_post') }}" class="space-y-md">
-        <div>
-          <label for="title" class="font-label-md text-label-md text-stone-500 uppercase tracking-wider block mb-2">제목</label>
-          <input
-            id="title"
-            name="title"
-            type="text"
-            value="{{ title }}"
-            class="w-full rounded-lg border border-outline-variant bg-white px-4 py-3 text-on-surface placeholder:text-stone-400 focus:border-secondary focus:ring-secondary"
-            placeholder="제목을 입력하세요"
-          />
+      <div>
+        <label class="block font-label-md text-label-md text-stone-500 mb-xs">이미지</label>
+        <div class="flex items-center gap-2">
+          <label class="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-outline-variant/70 text-sm text-on-surface-variant bg-surface-container-low hover:bg-surface-container cursor-pointer transition-colors">
+            <span class="material-symbols-outlined text-[18px]">upload_file</span>
+            파일 선택
+            <input type="file" name="image" accept="image/*" id="image_input" class="hidden">
+          </label>
+          <span id="file_name" class="text-sm text-stone-400">선택된 파일 없음</span>
         </div>
+        <div id="image_preview" class="mt-xs h-32 rounded-lg overflow-hidden border border-outline-variant/30 {% if not image_url %}hidden{% endif %}">
+          <img id="image_preview_img" src="{{ image_url }}" alt="미리보기" class="w-full h-full object-cover">
+        </div>
+      </div>
 
-        <div>
-          <label for="content" class="font-label-md text-label-md text-stone-500 uppercase tracking-wider block mb-2">본문</label>
-          <textarea
-            id="content"
-            name="content"
-            rows="14"
-            class="w-full rounded-lg border border-outline-variant bg-white px-4 py-3 text-on-surface placeholder:text-stone-400 focus:border-secondary focus:ring-secondary"
-            placeholder="당신의 이야기를 들려주세요"
-          >{{ content }}</textarea>
-        </div>
+      <div>
+        <label class="block font-label-md text-label-md text-stone-500 mb-xs">본문</label>
+        <textarea name="content" rows="18" placeholder="상황 설명과 대화를 입력하세요..." class="w-full px-3 py-2 rounded-lg border border-outline-variant/70 text-sm bg-surface-container-low focus:outline-none focus:border-secondary transition-colors resize-y">{{ content }}</textarea>
+      </div>
 
-        <div class="flex flex-wrap items-center gap-3 pt-2">
-          <button type="submit" class="inline-flex items-center gap-2 bg-secondary text-white px-md py-sm rounded-lg font-label-md text-label-md hover:opacity-90 transition-opacity">
-            <span class="material-symbols-outlined text-[20px]">check</span>
-            저장
-          </button>
-          <a href="{{ url_for('list_posts') }}" class="inline-flex items-center gap-2 border border-outline text-on-surface px-md py-sm rounded-lg font-label-md text-label-md hover:bg-surface-container transition-colors">
-            <span class="material-symbols-outlined text-[20px]">close</span>
-            취소
-          </a>
-        </div>
-      </form>
-    </section>
+      <div class="flex gap-sm">
+        <button type="submit" class="bg-secondary text-white px-md py-sm rounded-lg flex items-center gap-2 hover:opacity-90 transition-opacity font-label-md text-label-md">
+          <span class="material-symbols-outlined text-sm">save</span>
+          저장
+        </button>
+        <a href="{{ url_for('list_posts') }}" class="border border-outline-variant/70 text-on-surface-variant px-md py-sm rounded-lg flex items-center gap-2 hover:bg-surface-container-low transition-colors font-label-md text-label-md">
+          취소
+        </a>
+      </div>
+    </form>
+
+    <script>
+      document.getElementById('image_input').addEventListener('change', function(e) {
+        var file = e.target.files[0];
+        var nameEl = document.getElementById('file_name');
+        var preview = document.getElementById('image_preview');
+        var img = document.getElementById('image_preview_img');
+        if (file) {
+          nameEl.textContent = file.name;
+          var reader = new FileReader();
+          reader.onload = function(ev) {
+            img.src = ev.target.result;
+            preview.classList.remove('hidden');
+          };
+          reader.readAsDataURL(file);
+        } else {
+          nameEl.textContent = '선택된 파일 없음';
+        }
+      });
+    </script>
   </main>
 {% endblock %}
