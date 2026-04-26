@@ -54,33 +54,19 @@ def ensure_schema():
     init_db_if_needed()
 
 
-PER_PAGE = 10
-
-
 @app.route("/")
 def list_posts():
-    page = request.args.get("page", 1, type=int)
+    conn = get_connection()
+    posts = conn.execute(
+        "SELECT id, title, content, created_at FROM posts ORDER BY id DESC"
+    ).fetchall()
+    conn.close()
+
     view = request.args.get("view", "sidebar")
     if view not in {"sidebar", "center", "split"}:
         view = "sidebar"
 
-    conn = get_connection()
-    total = conn.execute("SELECT COUNT(*) FROM posts").fetchone()[0]
-    posts = conn.execute(
-        "SELECT id, title, content, created_at FROM posts ORDER BY id DESC LIMIT ? OFFSET ?",
-        (PER_PAGE, (page - 1) * PER_PAGE),
-    ).fetchall()
-    conn.close()
-
-    total_pages = max(1, (total + PER_PAGE - 1) // PER_PAGE)
-
-    return render_template(
-        "list.html",
-        posts=posts,
-        view=view,
-        page=page,
-        total_pages=total_pages,
-    )
+    return render_template("list.html", posts=posts, view=view)
 
 
 @app.route("/posts/<int:post_id>")
