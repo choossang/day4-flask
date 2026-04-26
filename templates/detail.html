@@ -32,7 +32,6 @@
         {% endfor %}
       </div>
 
-      {% if is_admin %}
       <footer class="mt-xl pt-lg border-t border-stone-200 flex flex-wrap items-center gap-sm">
         <a href="{{ url_for('edit_post', post_id=post['id']) }}" class="bg-secondary text-white px-md py-sm rounded-lg flex items-center gap-2 hover:opacity-90 transition-opacity font-label-md text-label-md">
           <span class="material-symbols-outlined text-sm">edit</span>
@@ -45,7 +44,6 @@
           </button>
         </form>
       </footer>
-      {% endif %}
     </article>
   </main>
 {% endblock %}

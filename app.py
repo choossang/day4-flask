@@ -1,25 +1,12 @@
-import hashlib
 import os
 import sqlite3
 import uuid
 from datetime import datetime
 
-from dotenv import load_dotenv
-from flask import Flask, abort, redirect, render_template, request, session, url_for
-
-load_dotenv()
+from flask import Flask, abort, redirect, render_template, request, url_for
 
 app = Flask(__name__)
 app.config.setdefault("DATABASE", "board.db")
-app.secret_key = os.environ.get("SECRET_KEY", "change-this-secret-key")
-
-ADMIN_PASSWORD_HASH = hashlib.sha256(
-    os.environ.get("ADMIN_PASSWORD", "").encode()
-).hexdigest()
-
-
-def is_authenticated():
-    return session.get("auth") == ADMIN_PASSWORD_HASH
 
 UPLOAD_FOLDER = os.path.join(app.static_folder, "uploads")
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "webp"}
@@ -91,24 +78,6 @@ def ensure_schema():
 
 
 PER_PAGE = 10
-
-
-@app.route("/login", methods=["GET", "POST"])
-def login():
-    error = None
-    if request.method == "POST":
-        pw = request.form.get("password", "")
-        if hashlib.sha256(pw.encode()).hexdigest() == ADMIN_PASSWORD_HASH:
-            session["auth"] = ADMIN_PASSWORD_HASH
-            return redirect(request.args.get("next", url_for("list_posts")))
-        error = "비밀번호가 틀렸습니다"
-    return render_template("login.html", error=error)
-
-
-@app.route("/logout")
-def logout():
-    session.pop("auth", None)
-    return redirect(url_for("list_posts"))
 CATEGORIES = [
     "인사·만남", "카페·식당", "교통·이동", "쇼핑", "병원·건강",
     "금융·업무", "일상대화", "숙박·여행", "직장·비즈니스", "학교·교육",
@@ -177,13 +146,11 @@ def show_post(post_id: int):
     if view not in {"sidebar", "center", "split"}:
         view = "sidebar"
 
-    return render_template("detail.html", post=post, view=view, is_admin=is_authenticated())
+    return render_template("detail.html", post=post, view=view)
 
 
 @app.route("/posts/<int:post_id>/edit", methods=["GET", "POST"])
 def edit_post(post_id: int):
-    if not is_authenticated():
-        return redirect(url_for("login", next=request.url))
     conn = get_connection()
     post = conn.execute(
         "SELECT * FROM posts WHERE id = ?",
@@ -244,8 +211,6 @@ def edit_post(post_id: int):
 
 @app.route("/posts/<int:post_id>/delete", methods=["POST"])
 def delete_post(post_id: int):
-    if not is_authenticated():
-        return redirect(url_for("login", next=url_for("list_posts")))
     conn = get_connection()
     conn.execute("DELETE FROM posts WHERE id = ?", (post_id,))
     conn.commit()
@@ -255,8 +220,6 @@ def delete_post(post_id: int):
 
 @app.route("/write", methods=["GET", "POST"])
 def write_post():
-    if not is_authenticated():
-        return redirect(url_for("login", next=request.url))
     error = None
 
     if request.method == "POST":

@@ -110,7 +110,6 @@
           <a class="text-stone-500 font-medium font-label-md text-label-md hover:text-stone-900 transition-colors duration-300" href="{{ url_for('write_post') }}">글쓰기</a>
         </nav>
         <div class="flex items-center gap-3">
-          <a href="{{ url_for('logout') if session.get('auth') else url_for('login') }}" class="material-symbols-outlined text-stone-800 hover:text-secondary transition-colors cursor-pointer" title="{{ '로그아웃' if session.get('auth') else '로그인' }}">{{ 'logout' if session.get('auth') else 'login' }}</a>
         </div>
       </div>
     </header>
