@@ -13,3 +13,6 @@ docs/superpowers/
 *.log
 .coverage
 htmlcov/
+
+.env
+static/uploads/

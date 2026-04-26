@@ -4,14 +4,17 @@ import sqlite3
 import uuid
 from datetime import datetime
 
+from dotenv import load_dotenv
 from flask import Flask, abort, redirect, render_template, request, session, url_for
+
+load_dotenv()
 
 app = Flask(__name__)
 app.config.setdefault("DATABASE", "board.db")
-app.secret_key = os.environ.get("SECRET_KEY", "dev-secret-change-in-production")
+app.secret_key = os.environ.get("SECRET_KEY", "change-this-secret-key")
 
 ADMIN_PASSWORD_HASH = hashlib.sha256(
-    os.environ.get("ADMIN_PASSWORD", "120715").encode()
+    os.environ.get("ADMIN_PASSWORD", "").encode()
 ).hexdigest()
 
 
