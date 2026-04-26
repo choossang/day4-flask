@@ -83,5 +83,29 @@
         </a>
       </section>
     {% endif %}
+
+    {% if total_pages > 1 %}
+    <nav class="mt-lg flex justify-center items-center gap-2">
+      {% if page > 1 %}
+        <a href="{{ url_for('list_posts', page=page-1, view=view) }}" class="inline-flex items-center gap-1 px-3 py-2 rounded-lg border border-outline-variant/70 text-sm text-on-surface-variant hover:bg-surface-container-low transition-colors">
+          <span class="material-symbols-outlined text-[18px]">chevron_left</span> 이전
+        </a>
+      {% endif %}
+
+      {% for p in range(1, total_pages + 1) %}
+        {% if p == page %}
+          <span class="px-3 py-2 rounded-lg bg-secondary text-white text-sm font-medium">{{ p }}</span>
+        {% else %}
+          <a href="{{ url_for('list_posts', page=p, view=view) }}" class="px-3 py-2 rounded-lg border border-outline-variant/70 text-sm text-on-surface-variant hover:bg-surface-container-low transition-colors">{{ p }}</a>
+        {% endif %}
+      {% endfor %}
+
+      {% if page < total_pages %}
+        <a href="{{ url_for('list_posts', page=page+1, view=view) }}" class="inline-flex items-center gap-1 px-3 py-2 rounded-lg border border-outline-variant/70 text-sm text-on-surface-variant hover:bg-surface-container-low transition-colors">
+          다음 <span class="material-symbols-outlined text-[18px]">chevron_right</span>
+        </a>
+      {% endif %}
+    </nav>
+    {% endif %}
   </main>
 {% endblock %}
